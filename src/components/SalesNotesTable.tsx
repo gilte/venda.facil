@@ -43,12 +43,13 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
           headers['Authorization'] = `Bearer ${token}`;
         }
         
-        const response = await fetch('/api/sales-notes', { headers });
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const response = await fetch(`${baseUrl}/api/sales-notes`, { headers });
 
         if (!response.ok) {
-           // If the user is not logged in, we can show an empty table
           if (response.status === 401 || response.status === 403) {
             setNotes([]);
+            setLoading(false);
             return;
           }
           throw new Error('Falha ao buscar dados.');
@@ -79,7 +80,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       <Card className="text-center py-12">
         <CardContent>
           <h3 className="font-headline text-xl font-semibold">Nenhuma venda registrada</h3>
-          <p className="text-muted-foreground mt-2">Clique em "Adicionar Venda" para começar ou faça login para ver suas vendas.</p>
+          <p className="text-muted-foreground mt-2">Clique em "Adicionar Venda" para começar.</p>
         </CardContent>
       </Card>
     );

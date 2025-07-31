@@ -103,19 +103,21 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
   }, [note, form]);
 
   const onSubmit = async (data: SalesNoteFormData) => {
-    if (!user) return;
     setLoading(true);
     try {
-      const token = await user.getIdToken();
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (user) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const method = note ? 'PUT' : 'POST';
-      const url = note ? `/api/sales-notes/${note.id}` : '/api/sales-notes';
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const url = note ? `${baseUrl}/api/sales-notes/${note.id}` : `${baseUrl}/api/sales-notes`;
       
       const response = await fetch(url, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: headers,
         body: JSON.stringify(data),
       });
 

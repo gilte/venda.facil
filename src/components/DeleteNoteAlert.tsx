@@ -29,15 +29,19 @@ export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: Delet
   const { user } = useAuth();
 
   const handleDelete = async () => {
-    if (!noteId || !user) return;
+    if (!noteId) return;
     setLoading(true);
     try {
-      const token = await user.getIdToken();
-      const response = await fetch(`/api/sales-notes/${noteId}`, {
+      const headers: HeadersInit = {};
+      if (user) {
+        const token = await user.getIdToken();
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const response = await fetch(`${baseUrl}/api/sales-notes/${noteId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: headers,
       });
 
       if (!response.ok) {
