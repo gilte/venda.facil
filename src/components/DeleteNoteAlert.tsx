@@ -8,9 +8,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { AlertDialogCancel } from './ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -65,7 +65,7 @@ export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: Delet
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
-          <Button onClick={handleDelete} disabled={loading} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button onClick={handleDelete} disabled={loading} variant="destructive">
             {loading ? <Loader2 className="animate-spin" /> : 'Sim, excluir'}
           </Button>
         </AlertDialogFooter>

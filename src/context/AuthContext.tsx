@@ -52,6 +52,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     loadUserFromToken();
+    
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'token') {
+        loadUserFromToken();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+
   }, [loadUserFromToken]);
 
   const handleAuthSuccess = (newToken: string) => {

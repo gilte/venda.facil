@@ -62,7 +62,9 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       }
     };
 
-    fetchNotes();
+    if (token) {
+      fetchNotes();
+    }
   }, [token]);
 
   if (loading) {
