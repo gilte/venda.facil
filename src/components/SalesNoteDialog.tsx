@@ -65,6 +65,7 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
   const { toast } = useToast();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const form = useForm<SalesNoteFormData>({
     resolver: zodResolver(formSchema),
@@ -117,8 +118,7 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
       };
 
       const method = note ? 'PUT' : 'POST';
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const url = note ? `${baseUrl}/api/sales-notes/${note.id}` : `${baseUrl}/api/sales-notes`;
+      const url = note ? `${API_URL}/api/sales-notes/${note.id}` : `${API_URL}/api/sales-notes`;
       
       const response = await fetch(url, {
         method: method,

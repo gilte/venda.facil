@@ -26,13 +26,13 @@ export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: Delet
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { token } = useAuth();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const handleDelete = async () => {
     if (!noteId || !token) return;
     setLoading(true);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const response = await fetch(`${baseUrl}/api/sales-notes/${noteId}`, {
+      const response = await fetch(`${API_URL}/api/sales-notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

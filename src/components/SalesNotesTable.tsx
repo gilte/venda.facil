@@ -32,6 +32,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
   const [notes, setNotes] = useState<SalesNote[]>([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -42,8 +43,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       
       setLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        const response = await fetch(`${baseUrl}/api/sales-notes`, {
+        const response = await fetch(`${API_URL}/api/sales-notes`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -65,7 +65,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
     if (token) {
       fetchNotes();
     }
-  }, [token]);
+  }, [token, API_URL]);
 
   if (loading) {
     return (
