@@ -1,20 +1,21 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import config from 'config';
-import { check, validationResult } from 'express-validator';
+const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const User = require('../models/User');
 
-import User from '../models/User.js';
-
-// @route    POST api/users
-// @desc     Register user
-// @access   Public
+// @route   POST api/users
+// @desc    Register user
+// @access  Public
 router.post(
   '/',
-  check('name', 'Name is required').not().isEmpty(),
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
+  [
+    check('name', 'Nome é obrigatório').not().isEmpty(),
+    check('email', 'Inclua um email válido').isEmail(),
+    check('password', 'Por favor, insira uma senha com 6 ou mais caracteres').isLength({ min: 6 }),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -27,7 +28,7 @@ router.post(
       let user = await User.findOne({ email });
 
       if (user) {
-        return res.status(400).json({ msg: 'User already exists' });
+        return res.status(400).json({ msg: 'Usuário com este email já existe' });
       }
 
       user = new User({
@@ -36,32 +37,41 @@ router.post(
         password,
       });
 
+      // Gerar o salt para o hashing da senha
       const salt = await bcrypt.genSalt(10);
 
+      // Hashear a senha
       user.password = await bcrypt.hash(password, salt);
 
+      // Salvar o usuário no banco de dados
       await user.save();
 
+      // Payload do JWT
       const payload = {
         user: {
           id: user.id,
+          name: user.name,
+          email: user.email,
         },
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
       };
 
+      // Gerar o JWT
       jwt.sign(
         payload,
         config.get('jwtSecret'),
-        { expiresIn: '5h' },
+        { expiresIn: '1h' },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
         }
       );
+
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server error');
+      res.status(500).send('Erro do Servidor');
     }
   }
 );
 
-export default router;
+module.exports = router;
