@@ -1,4 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
 
 export interface SalesNote {
   id: string;
@@ -11,7 +10,7 @@ export interface SalesNote {
   paymentMethod: 'Cartão de Crédito' | 'Espécie';
   paymentStatus: 'À vista' | 'A prazo';
   installments?: number;
-  createdAt: Timestamp;
+  createdAt: string; // Changed from Timestamp to string
 }
 
 export type SalesNoteFormData = Omit<SalesNote, 'id' | 'userId' | 'createdAt'>;

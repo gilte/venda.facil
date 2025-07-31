@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import type { SalesNote } from '@/lib/types';
 import {
   Table,
@@ -40,16 +38,16 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       if (!user) return;
       setLoading(true);
       try {
-        const q = query(
-          collection(db, 'sales-notes'),
-          where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc')
-        );
-        const querySnapshot = await getDocs(q);
-        const notesData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as SalesNote[];
+        const token = await user.getIdToken();
+        const response = await fetch('/api/sales-notes', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Falha ao buscar dados.');
+        }
+        const notesData = await response.json();
         setNotes(notesData);
       } catch (error) {
         console.error("Error fetching notes: ", error);

@@ -32,9 +32,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-import type { SalesNote } from '@/lib/types';
+import type { SalesNote, SalesNoteFormData } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -55,8 +53,6 @@ const formSchema = z.object({
   message: 'A quantidade de vezes é obrigatória para pagamento a prazo.',
   path: ['installments'],
 });
-
-type SalesNoteFormData = z.infer<typeof formSchema>;
 
 interface SalesNoteDialogProps {
   open: boolean;
@@ -110,21 +106,24 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
     if (!user) return;
     setLoading(true);
     try {
-      if (note) {
-        // Update existing note
-        const noteRef = doc(db, 'sales-notes', note.id);
-        await updateDoc(noteRef, { ...data, installments: data.installments || null });
-        toast({ title: "Sucesso!", description: "Venda atualizada." });
-      } else {
-        // Create new note
-        await addDoc(collection(db, 'sales-notes'), {
-          ...data,
-          installments: data.installments || null,
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-        });
-        toast({ title: "Sucesso!", description: "Nova venda registrada." });
+      const token = await user.getIdToken();
+      const method = note ? 'PUT' : 'POST';
+      const url = note ? `/api/sales-notes/${note.id}` : '/api/sales-notes';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao salvar a venda.');
       }
+      
+      toast({ title: "Sucesso!", description: note ? "Venda atualizada." : "Nova venda registrada." });
       onSuccess();
       onOpenChange(false);
     } catch (error) {

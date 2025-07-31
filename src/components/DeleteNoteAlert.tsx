@@ -13,9 +13,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { db } from '@/lib/firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DeleteNoteAlertProps {
   open: boolean;
@@ -27,12 +26,24 @@ interface DeleteNoteAlertProps {
 export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: DeleteNoteAlertProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleDelete = async () => {
-    if (!noteId) return;
+    if (!noteId || !user) return;
     setLoading(true);
     try {
-      await deleteDoc(doc(db, 'sales-notes', noteId));
+      const token = await user.getIdToken();
+      const response = await fetch(`/api/sales-notes/${noteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao excluir a venda.');
+      }
+      
       toast({ title: 'Sucesso!', description: 'Venda excluída.' });
       onSuccess();
       onOpenChange(false);
