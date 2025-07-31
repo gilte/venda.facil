@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogCancel,
+  AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -35,7 +36,7 @@ export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: Delet
       const response = await fetch(`${API_URL}/api/sales-notes/${noteId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'x-auth-token': token,
         },
       });
 

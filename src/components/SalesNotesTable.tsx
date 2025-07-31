@@ -45,7 +45,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       try {
         const response = await fetch(`${API_URL}/api/sales-notes`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-auth-token': token,
           }
         });
 
@@ -64,6 +64,9 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
 
     if (token) {
       fetchNotes();
+    } else {
+        setLoading(false);
+        setNotes([]);
     }
   }, [token, API_URL]);
 

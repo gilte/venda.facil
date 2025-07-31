@@ -84,24 +84,26 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
   const paymentStatus = form.watch('paymentStatus');
 
   useEffect(() => {
-    if (note) {
-      form.reset({
-        ...note,
-        installments: note.installments ?? undefined,
-      });
-    } else {
-      form.reset({
-        customerName: '',
-        customerAge: 0,
-        customerGender: 'Masculino',
-        productPurchased: '',
-        purchaseAmount: 0,
-        paymentMethod: 'Cartão de Crédito',
-        paymentStatus: 'À vista',
-        installments: undefined,
-      });
+    if (open) {
+      if (note) {
+        form.reset({
+          ...note,
+          installments: note.installments ?? undefined,
+        });
+      } else {
+        form.reset({
+          customerName: '',
+          customerAge: 0,
+          customerGender: 'Masculino',
+          productPurchased: '',
+          purchaseAmount: 0,
+          paymentMethod: 'Cartão de Crédito',
+          paymentStatus: 'À vista',
+          installments: undefined,
+        });
+      }
     }
-  }, [note, form]);
+  }, [note, open, form]);
 
   const onSubmit = async (data: SalesNoteFormData) => {
     setLoading(true);
@@ -114,7 +116,7 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
     try {
       const headers: HeadersInit = { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'x-auth-token': token,
       };
 
       const method = note ? 'PUT' : 'POST';

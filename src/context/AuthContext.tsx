@@ -41,6 +41,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setToken(storedToken);
         } else {
           localStorage.removeItem('token');
+          setUser(null);
+          setToken(null);
         }
       }
     } catch (error) {
@@ -72,7 +74,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const decoded = jwtDecode<JwtPayload>(newToken);
     setUser(decoded.user);
     setToken(newToken);
-    router.push('/');
   };
 
   const login = async (email: string, password: string) => {

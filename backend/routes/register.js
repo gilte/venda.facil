@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { check, validationResult } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import config from 'config'; // Assumindo que 'config' suporta ESM ou é tratada
+import User from '../models/User.js'; // Assumindo que o modelo de usuário usa ESM
+
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const User = require('../models/User');
 
 // @route   POST api/users
 // @desc    Register user
@@ -74,4 +75,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;

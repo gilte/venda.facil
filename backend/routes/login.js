@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { check, validationResult } from 'express-validator';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import config from 'config';
+import User from '../models/User.js';
+
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const User = require('../models/User');
 
 // @route   POST api/auth
 // @desc    Authenticate user & get token
@@ -43,10 +44,7 @@ router.post(
           id: user.id,
           name: user.name,
           email: user.email,
-          // Incluir outras propriedades do usuário se o frontend precisar
         },
-         // Data de expiração do JWT em segundos (Ex: 24 horas)
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
       };
 
       // Gerar o JWT
@@ -67,4 +65,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;
