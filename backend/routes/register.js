@@ -61,7 +61,6 @@ router.post(
           name: user.name,
           email: user.email,
         },
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24)
       };
 
       // Gerar o JWT
