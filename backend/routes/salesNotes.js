@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const auth = require('../middleware/auth');
-const { check, validationResult } = require('express-validator');
-const asyncHandler = require('express-async-handler');
+import auth from '../middleware/auth.js';
+import { check, validationResult } from 'express-validator';
+import asyncHandler from 'express-async-handler';
 
-const SalesNote = require('../models/SalesNote');
+import SalesNote from '../models/SalesNote.js';
 
 // @route    GET api/sales-notes
 // @desc     Get all sales notes for a user
@@ -65,3 +65,5 @@ router.post(
     }
   })
 );
+
+export default router;

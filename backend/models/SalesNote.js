@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const SalesNoteSchema = new mongoose.Schema({
   user: {
@@ -18,4 +18,6 @@ const SalesNoteSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('salesNote', SalesNoteSchema);
+const SalesNote = mongoose.model('salesNote', SalesNoteSchema);
+
+export default SalesNote;

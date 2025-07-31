@@ -1,9 +1,12 @@
-const express = require('express');
-const connectDB = require('./config/db');
-const cors = require('cors');
-const dotenv = require('dotenv'); // Importar dotenv
+import express from 'express';
+import connectDB from './config/db.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import loginRoute from './routes/login.js';
+import testRoute from './routes/testRoute.js';
+import salesNotesRoute from './routes/salesNotes.js';
 
-dotenv.config(); // Carregar variáveis de ambiente do .env
+dotenv.config();
 
 const app = express();
 
@@ -11,15 +14,23 @@ const app = express();
 connectDB();
 
 // Init Middleware
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://6000-firebase-studio-1753986861394.cluster-duylic2g3fbzerqpzxxbw6helm.cloudworkstations.dev',
+    ],
+    credentials: true,
+
+
+}));
+
 app.use(express.json({ extended: false }));
 
 // Define Routes
 app.get('/', (req, res) => res.send('API Running')); // Rota de teste existente
-app.use('/api/auth', require('./routes/login')); // Rota de autenticação (login)
+app.use('/api/auth', loginRoute);
 // app.use('/api/users', require('./routes/register')); // Rota de usuários (registro) - Comentado
-app.use('/api/users', require('./routes/testRoute')); // Usando o router de teste aqui
-app.use('/api/sales-notes', require('./routes/salesNotes')); // Rota de notas de venda
+app.use('/api/users', testRoute);
+app.use('/api/sales-notes', salesNotesRoute);
 
 const PORT = process.env.PORT || 5000;
 
