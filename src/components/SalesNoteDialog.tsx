@@ -31,7 +31,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 import type { SalesNote, SalesNoteFormData } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
@@ -62,7 +61,6 @@ interface SalesNoteDialogProps {
 }
 
 export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNoteDialogProps) {
-  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -106,10 +104,6 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
     setLoading(true);
     try {
       const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (user) {
-        const token = await user.getIdToken();
-        headers['Authorization'] = `Bearer ${token}`;
-      }
 
       const method = note ? 'PUT' : 'POST';
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';

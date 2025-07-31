@@ -1,20 +1,15 @@
 "use client";
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { SalesNotesTable } from '@/components/SalesNotesTable';
 import { SalesNoteDialog } from '@/components/SalesNoteDialog';
 import { DeleteNoteAlert } from '@/components/DeleteNoteAlert';
 import type { SalesNote } from '@/lib/types';
-import { PlusCircle, LogOut, Loader2, User } from 'lucide-react';
+import { PlusCircle, User } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { user, logOut } = useAuth();
-  const router = useRouter();
-
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<SalesNote | null>(null);
 
@@ -41,11 +36,6 @@ export default function DashboardPage() {
   const handleSuccess = () => {
     setRefreshKey((prevKey) => prevKey + 1);
   };
-  
-  const handleLogout = async () => {
-    await logOut();
-    router.push('/login');
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,21 +43,12 @@ export default function DashboardPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           <h1 className="font-headline text-2xl font-bold text-primary">Venda Fácil</h1>
           <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
-                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sair">
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </>
-            ) : (
-               <Button asChild variant="ghost">
-                <Link href="/login">
-                  <User className="mr-2 h-5 w-5" />
-                  Entrar
-                </Link>
-              </Button>
-            )}
+            <Button asChild variant="ghost">
+              <Link href="/login">
+                <User className="mr-2 h-5 w-5" />
+                Entrar
+              </Link>
+            </Button>
           </div>
         </div>
       </header>

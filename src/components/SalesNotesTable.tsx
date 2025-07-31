@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import type { SalesNote } from '@/lib/types';
 import {
   Table,
@@ -29,7 +28,6 @@ interface SalesNotesTableProps {
 }
 
 export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
-  const { user } = useAuth();
   const [notes, setNotes] = useState<SalesNote[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,21 +35,10 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
     const fetchNotes = async () => {
       setLoading(true);
       try {
-        const headers: HeadersInit = {};
-        if (user) {
-          const token = await user.getIdToken();
-          headers['Authorization'] = `Bearer ${token}`;
-        }
-        
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        const response = await fetch(`${baseUrl}/api/sales-notes`, { headers });
+        const response = await fetch(`${baseUrl}/api/sales-notes`);
 
         if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            setNotes([]);
-            setLoading(false);
-            return;
-          }
           throw new Error('Falha ao buscar dados.');
         }
         const notesData = await response.json();
@@ -65,7 +52,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
     };
 
     fetchNotes();
-  }, [user]);
+  }, []);
 
   if (loading) {
     return (

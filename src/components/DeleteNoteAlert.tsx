@@ -14,7 +14,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
 
 interface DeleteNoteAlertProps {
   open: boolean;
@@ -26,22 +25,14 @@ interface DeleteNoteAlertProps {
 export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: DeleteNoteAlertProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const handleDelete = async () => {
     if (!noteId) return;
     setLoading(true);
     try {
-      const headers: HeadersInit = {};
-      if (user) {
-        const token = await user.getIdToken();
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const response = await fetch(`${baseUrl}/api/sales-notes/${noteId}`, {
         method: 'DELETE',
-        headers: headers,
       });
 
       if (!response.ok) {
