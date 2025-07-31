@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,11 @@ import { SalesNotesTable } from '@/components/SalesNotesTable';
 import { SalesNoteDialog } from '@/components/SalesNoteDialog';
 import { DeleteNoteAlert } from '@/components/DeleteNoteAlert';
 import type { SalesNote } from '@/lib/types';
-import { PlusCircle, LogOut, Loader2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { PlusCircle, LogOut, Loader2, User } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { user, loading, logOut } = useAuth();
+  const { user, logOut } = useAuth();
   const router = useRouter();
 
   const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
@@ -22,20 +22,6 @@ export default function DashboardPage() {
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
-
-  if (loading || !user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   const handleAddNew = () => {
     setEditingNote(null);
@@ -67,10 +53,21 @@ export default function DashboardPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           <h1 className="font-headline text-2xl font-bold text-primary">Venda Fácil</h1>
           <div className="flex items-center gap-4">
-             <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
-            <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sair">
-              <LogOut className="h-5 w-5" />
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden sm:inline">{user.email}</span>
+                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Sair">
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </>
+            ) : (
+               <Button asChild variant="ghost">
+                <Link href="/login">
+                  <User className="mr-2 h-5 w-5" />
+                  Entrar
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>

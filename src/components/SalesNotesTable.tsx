@@ -35,22 +35,29 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
 
   useEffect(() => {
     const fetchNotes = async () => {
-      if (!user) return;
       setLoading(true);
       try {
-        const token = await user.getIdToken();
-        const response = await fetch('/api/sales-notes', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+        const headers: HeadersInit = {};
+        if (user) {
+          const token = await user.getIdToken();
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch('/api/sales-notes', { headers });
+
         if (!response.ok) {
+           // If the user is not logged in, we can show an empty table
+          if (response.status === 401 || response.status === 403) {
+            setNotes([]);
+            return;
+          }
           throw new Error('Falha ao buscar dados.');
         }
         const notesData = await response.json();
         setNotes(notesData);
       } catch (error) {
         console.error("Error fetching notes: ", error);
+        setNotes([]);
       } finally {
         setLoading(false);
       }
@@ -72,7 +79,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
       <Card className="text-center py-12">
         <CardContent>
           <h3 className="font-headline text-xl font-semibold">Nenhuma venda registrada</h3>
-          <p className="text-muted-foreground mt-2">Clique em "Adicionar Venda" para começar.</p>
+          <p className="text-muted-foreground mt-2">Clique em "Adicionar Venda" para começar ou faça login para ver suas vendas.</p>
         </CardContent>
       </Card>
     );
