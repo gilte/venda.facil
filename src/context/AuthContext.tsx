@@ -99,7 +99,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.msg || 'Falha no registro');
+      const errorMessage = data.errors ? data.errors[0].msg : (data.msg || 'Falha no registro');
+      throw new Error(errorMessage);
     }
     handleAuthSuccess(data.token);
   };
