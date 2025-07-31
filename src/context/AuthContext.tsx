@@ -1,8 +1,10 @@
 "use client";
 
 import { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { User } from '@/lib/types';
+import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
+import type { User } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +26,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { toast } = useToast();
 
   const loadUserFromToken = useCallback(() => {
     setLoading(true);
@@ -35,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(decoded.user);
           setToken(storedToken);
         } else {
-          // Token expired
           localStorage.removeItem('token');
         }
       }
@@ -56,37 +59,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const decoded = jwtDecode<JwtPayload>(newToken);
     setUser(decoded.user);
     setToken(newToken);
+    router.push('/');
   };
 
   const login = async (email: string, password: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${baseUrl}/api/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    
+
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.msg || 'Falha no login');
     }
-
     handleAuthSuccess(data.token);
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${baseUrl}/api/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
     });
 
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.msg || 'Falha no registro');
+      throw new Error(data.msg || 'Falha no registro');
     }
-    
     handleAuthSuccess(data.token);
   };
 
@@ -94,19 +96,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
     setUser(null);
     setToken(null);
-  };
-
-  const value = {
-    user,
-    token,
-    loading,
-    login,
-    register,
-    logout,
+    router.push('/login');
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
