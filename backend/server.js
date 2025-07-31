@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import registerRoute from './routes/register.js';
 import loginRoute from './routes/login.js';
 import salesNotesRoute from './routes/salesNotes.js';
 
+dotenv.config();
 
 const app = express();
 

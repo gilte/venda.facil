@@ -2,10 +2,17 @@ import express from 'express';
 import { check, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import config from 'config'; // Assumindo que 'config' suporta ESM ou é tratada
-import User from '../models/User.js'; // Assumindo que o modelo de usuário usa ESM
+import User from '../models/User.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const configPath = path.resolve(__dirname, '../config/default.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
 // @route   POST api/users
 // @desc    Register user
@@ -60,7 +67,7 @@ router.post(
       // Gerar o JWT
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
+        config.jwtSecret,
         { expiresIn: '1h' },
         (err, token) => {
           if (err) throw err;

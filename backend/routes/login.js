@@ -2,10 +2,18 @@ import express from 'express';
 import { check, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import config from 'config';
 import User from '../models/User.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const configPath = path.resolve(__dirname, '../config/default.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+
 
 // @route   POST api/auth
 // @desc    Authenticate user & get token
@@ -50,7 +58,7 @@ router.post(
       // Gerar o JWT
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
+        config.jwtSecret,
         { expiresIn: '1h' }, // Opcional: tempo de expiração no lado do servidor também
         (err, token) => {
           if (err) throw err;
