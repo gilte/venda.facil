@@ -1,7 +1,6 @@
 
 export interface SalesNote {
   id: string;
-  userId: string;
   customerName: string;
   customerAge: number;
   customerGender: 'Masculino' | 'Feminino' | 'Outro';
@@ -10,7 +9,14 @@ export interface SalesNote {
   paymentMethod: 'Cartão de Crédito' | 'Espécie';
   paymentStatus: 'À vista' | 'A prazo';
   installments?: number;
-  createdAt: string; // Changed from Timestamp to string
+  createdAt: string; 
+  user?: string; // Optional user field from backend
 }
 
-export type SalesNoteFormData = Omit<SalesNote, 'id' | 'userId' | 'createdAt'>;
+export type SalesNoteFormData = Omit<SalesNote, 'id' | 'createdAt' | 'user' >;
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}

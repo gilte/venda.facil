@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -12,8 +10,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { AlertDialogCancel } from './ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DeleteNoteAlertProps {
   open: boolean;
@@ -25,14 +25,18 @@ interface DeleteNoteAlertProps {
 export function DeleteNoteAlert({ open, onOpenChange, onSuccess, noteId }: DeleteNoteAlertProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { token } = useAuth();
 
   const handleDelete = async () => {
-    if (!noteId) return;
+    if (!noteId || !token) return;
     setLoading(true);
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const response = await fetch(`${baseUrl}/api/sales-notes/${noteId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {

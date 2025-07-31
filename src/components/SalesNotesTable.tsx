@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SalesNotesTableProps {
   onEdit: (note: SalesNote) => void;
@@ -30,13 +31,23 @@ interface SalesNotesTableProps {
 export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
   const [notes, setNotes] = useState<SalesNote[]>([]);
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchNotes = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      };
+      
       setLoading(true);
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        const response = await fetch(`${baseUrl}/api/sales-notes`);
+        const response = await fetch(`${baseUrl}/api/sales-notes`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
 
         if (!response.ok) {
           throw new Error('Falha ao buscar dados.');
@@ -52,7 +63,7 @@ export function SalesNotesTable({ onEdit, onDelete }: SalesNotesTableProps) {
     };
 
     fetchNotes();
-  }, []);
+  }, [token]);
 
   if (loading) {
     return (

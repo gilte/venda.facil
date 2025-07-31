@@ -33,6 +33,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import type { SalesNote, SalesNoteFormData } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const formSchema = z.object({
   customerName: z.string().min(2, { message: 'O nome do cliente é obrigatório.' }),
@@ -62,6 +63,7 @@ interface SalesNoteDialogProps {
 
 export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNoteDialogProps) {
   const { toast } = useToast();
+  const { token } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SalesNoteFormData>({
@@ -102,8 +104,17 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
 
   const onSubmit = async (data: SalesNoteFormData) => {
     setLoading(true);
+    if (!token) {
+        toast({ variant: "destructive", title: "Erro de Autenticação", description: "Por favor, faça login novamente." });
+        setLoading(false);
+        return;
+    }
+
     try {
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      const headers: HeadersInit = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      };
 
       const method = note ? 'PUT' : 'POST';
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
@@ -116,15 +127,16 @@ export function SalesNoteDialog({ open, onOpenChange, onSuccess, note }: SalesNo
       });
 
       if (!response.ok) {
-        throw new Error('Falha ao salvar a venda.');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao salvar a venda.');
       }
       
       toast({ title: "Sucesso!", description: note ? "Venda atualizada." : "Nova venda registrada." });
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving note:", error);
-      toast({ variant: "destructive", title: "Erro", description: "Não foi possível salvar a venda." });
+      toast({ variant: "destructive", title: "Erro", description: error.message || "Não foi possível salvar a venda." });
     } finally {
       setLoading(false);
     }
